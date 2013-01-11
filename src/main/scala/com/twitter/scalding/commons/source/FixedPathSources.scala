@@ -19,12 +19,18 @@ package com.twitter.scalding.commons.source
 import com.google.protobuf.Message
 import com.twitter.scalding._
 import com.twitter.scalding.Dsl._
+import com.twitter.scrooge.ThriftStruct
 import java.io.Serializable
 import org.apache.thrift.TBase
 
 abstract class FixedPathLzoThrift[T <: TBase[_, _]: Manifest](path: String*)
   extends FixedPathSource(path: _*) with LzoThrift[T] {
   def column = manifest[T].erasure
+}
+
+abstract class FixedPathLzoScrooge[T <: ThriftStruct: Manifest](path: String)
+  extends FixedPathSource(path) with LzoScrooge[T] {
+  override val tClass = manifest[T].erasure.asInstanceOf[Class[T]]
 }
 
 abstract class FixedPathLzoProtobuf[T <: Message: Manifest](path: String)

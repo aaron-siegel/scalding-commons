@@ -23,6 +23,7 @@ import com.twitter.elephantbird.cascading2.scheme._
 import com.twitter.elephantbird.util.{ ThriftUtils, TypeRef }
 import com.twitter.scalding._
 import com.twitter.scalding.source._
+import com.twitter.scrooge.ThriftStruct
 
 import cascading.tuple.Fields
 import java.io.Serializable
@@ -46,6 +47,11 @@ abstract class DailySuffixLzoProtobuf[T <: Message: Manifest](prefix: String, da
 abstract class DailySuffixLzoThrift[T <: TBase[_, _]: Manifest](prefix: String, dateRange: DateRange)
   extends DailySuffixSource(prefix, dateRange) with LzoThrift[T] {
   override def column = manifest[T].erasure
+}
+
+abstract class DailySuffixLzoScrooge[T <: ThriftStruct: Manifest](prefix: String, dateRange: DateRange)
+  extends DailySuffixSource(prefix, dateRange) with LzoScrooge[T] {
+  override val tClass = manifest[T].erasure.asInstanceOf[Class[T]]
 }
 
 abstract class DailyPrefixSuffixLzoThrift[T <: TBase[_,_] : Manifest](prefix : String, suffix : String, dateRange : DateRange)

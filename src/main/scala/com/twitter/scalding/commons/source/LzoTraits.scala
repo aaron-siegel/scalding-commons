@@ -25,13 +25,15 @@ import com.twitter.bijection.Bijection
 import com.twitter.elephantbird.cascading2.scheme._
 import com.twitter.scalding._
 import com.twitter.scalding.Dsl._
+import com.twitter.scalding.commons.scheme.scrooge.LzoScroogeScheme
+import com.twitter.scrooge.ThriftStruct
 import org.apache.hadoop.mapred.{ JobConf, OutputCollector, RecordReader }
 import org.apache.thrift.TBase
 
 trait LzoCodec[T] extends FileSource with Mappable[T] {
   def bijection: Bijection[T,Array[Byte]]
   override def localPath = sys.error("Local mode not yet supported.")
-  override def hdfsScheme = HadoopSchemeInstance(new LzoByteArrayScheme)
+  override def hdfsScheme = HadoopSchemeInstance(new LzoByteArrayScheme().asInstanceOf[Scheme[_,_,_,_,_]])
   override val converter = Dsl.singleConverter[T]
   override def transformForRead(pipe: Pipe) =
     pipe.map(0 -> 0) { bijection.invert(_: Array[Byte]) }
@@ -43,14 +45,21 @@ trait LzoCodec[T] extends FileSource with Mappable[T] {
 trait LzoProtobuf[T <: Message] extends Mappable[T] {
   def column: Class[_]
   override def localScheme = { println("This does not work yet"); new CLTextDelimited(sourceFields) }
-  override def hdfsScheme = HadoopSchemeInstance(new LzoProtobufScheme[T](column))
+  override def hdfsScheme = HadoopSchemeInstance(new LzoProtobufScheme[T](column).asInstanceOf[Scheme[_,_,_,_,_]])
   override val converter = Dsl.singleConverter[T]
 }
 
 trait LzoThrift[T <: TBase[_, _]] extends Mappable[T] {
   def column: Class[_]
   override def localScheme = { println("This does not work yet"); new CLTextDelimited(sourceFields) }
-  override def hdfsScheme = HadoopSchemeInstance(new LzoThriftScheme[T](column))
+  override def hdfsScheme = HadoopSchemeInstance(new LzoThriftScheme[T](column).asInstanceOf[Scheme[_,_,_,_,_]])
+  override val converter = Dsl.singleConverter[T]
+}
+
+trait LzoScrooge[T <: ThriftStruct] extends Mappable[T] {
+  def tClass: Class[T]
+  override def localScheme = { println("This does not work yet"); new CLTextDelimited(sourceFields) }
+  override def hdfsScheme = HadoopSchemeInstance(new LzoScroogeScheme[T](tClass).asInstanceOf[Scheme[_,_,_,_,_]])
   override val converter = Dsl.singleConverter[T]
 }
 

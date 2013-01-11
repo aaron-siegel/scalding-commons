@@ -27,6 +27,7 @@ libraryDependencies ++= Seq(
   "com.twitter" %% "scalding" % "0.8.1",
   "com.twitter" %% "chill" % "0.0.4",
   "com.twitter.elephantbird" % "elephant-bird-cascading2" % "3.0.6",
+  "com.twitter" % "scrooge-runtime" % "2.3.2",
   "com.hadoop.gplcompression" % "hadoop-lzo" % "0.4.16",
   "org.apache.thrift" % "libthrift" % "0.5.0",
   "org.scalacheck" %% "scalacheck" % "1.10.0" % "test",

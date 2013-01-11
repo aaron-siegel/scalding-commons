@@ -23,6 +23,7 @@ import com.twitter.chill.MeatLocker
 import com.twitter.scalding._
 import com.twitter.scalding.Dsl._
 import com.twitter.scalding.source._
+import com.twitter.scrooge.ThriftStruct
 import java.io.Serializable
 import org.apache.thrift.TBase
 
@@ -41,6 +42,11 @@ case class HourlySuffixLzoTsv(prefix: String, fs: Fields = Fields.ALL)(override 
 abstract class HourlySuffixLzoThrift[T <: TBase[_, _]: Manifest](prefix: String, dateRange: DateRange)
   extends HourlySuffixSource(prefix, dateRange) with LzoThrift[T] {
   override def column = manifest[T].erasure
+}
+
+abstract class HourlySuffixLzoScrooge[T <: ThriftStruct: Manifest](prefix: String, dateRange: DateRange)
+  extends HourlySuffixSource(prefix, dateRange) with LzoScrooge[T] {
+  override val tClass = manifest[T].erasure.asInstanceOf[Class[T]]
 }
 
 abstract class HourlySuffixLzoProtobuf[T <: Message: Manifest](prefix: String, dateRange: DateRange)
